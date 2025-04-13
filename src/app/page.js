@@ -5,6 +5,14 @@ import { Toaster, toast } from "sonner";
 import { encryptFile, toBase64 } from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
 import { NoSecurity, Rocket, Secure, Server, Upload } from "@/icons";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
+
 import axios from "axios";
 
 // Constants for validation
@@ -332,7 +340,7 @@ export default function UploadFile() {
               </div>
             ) : (
               // Stage 2 - File Upload Form
-              <div className="flex w-full items-center flex-col pb-7 justify-between">
+              <div className="flex w-full items-center flex-col pb-4 justify-between">
                 <div className="w-full">
                   <h2 className="text-2xl text-white/90 text-center font-semibold">
                     UPLOAD
@@ -367,11 +375,28 @@ export default function UploadFile() {
                       />
                     </div>
                   </div>
+                  <div className="mt-8 flex items-center  justify-between text-lg">
+                    Delete file after
+                    <div>
+                      <Select>
+                        <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
+                          <SelectValue placeholder="30 days" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1 day</SelectItem>
+                          <SelectItem value="3">3 days</SelectItem>
+                          <SelectItem value="7">7 days</SelectItem>
+                          <SelectItem value="15">15 days</SelectItem>
+                          <SelectItem value="30">30 days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
                 </div>
                 <button
                   onClick={handleUpload}
                   disabled={isUploading}
-                  className="px-4 py-2 rounded-md text-center relative overflow-hidden bg-white/90 cursor-pointer dark:bg-black dark:text-white text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
+                  className="px-4 py-2 rounded-md text-center relative overflow-hidden !bg-white/90 cursor-pointer  text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
                 >
                   <div
                     style={{ width: `${uploadProgress}%` }}
