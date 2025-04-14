@@ -34,6 +34,7 @@ export default function UploadFile() {
   // State for form inputs
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
+  const [expiryDays, setExpiryDays] = useState(30);
 
   // State for upload process
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -220,6 +221,7 @@ export default function UploadFile() {
           verification_IV: toBase64(verificationIV),
           file_path: filePath,
           download_url: downloadUrl,
+          expiry_days: expiryDays,
         },
       ]);
 
@@ -376,9 +378,15 @@ export default function UploadFile() {
                     </div>
                   </div>
                   <div className="mt-8 flex items-center  justify-between text-lg">
-                    Delete file after
+                    Delete after
                     <div>
-                      <Select>
+                      <Select
+                        value={expiryDays.toString()}
+                        onValueChange={(value) =>
+                          setExpiryDays(parseInt(value))
+                        }
+                      >
+                        {" "}
                         <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
                           <SelectValue placeholder="30 days" />
                         </SelectTrigger>
