@@ -2,6 +2,7 @@ import { Poppins } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
 import { NuqsAdapter } from "nuqs/adapters/next/app";
+import { Suspense } from "react";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -26,7 +27,15 @@ export default function RootLayout({ children }) {
         />
       </head>
       <body className="antialiased">
-        <NuqsAdapter>{children}</NuqsAdapter>
+        <Suspense
+          fallback={
+            <div className="text-white text-center h-screen w-screen flex items-center justify-center bg-black">
+              Loading...
+            </div>
+          }
+        >
+          <NuqsAdapter>{children}</NuqsAdapter>
+        </Suspense>
       </body>
     </html>
   );

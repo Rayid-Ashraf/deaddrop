@@ -5,7 +5,7 @@ export default function HeroText() {
     <div className="lg:w-[50%]">
       <h1 className="text-[40px] lg:text-5xl font-bold leading-[50px] xl:leading-[64px]">
         Share Files Securely <br className="hidden xl:block" />{" "}
-        <span className="xl:block">— </span>
+        <span className="xl:hidden">— </span>
         No Signups, No Stress
       </h1>
       <p className="text-white/90 mt-6">
