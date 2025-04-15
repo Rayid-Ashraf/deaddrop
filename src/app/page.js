@@ -276,7 +276,8 @@ export default function UploadFile() {
    */
   const uploadFile = async (file, bucketName, onProgress) => {
     try {
-      const fileName = `${name}.enc`;
+      const safeName = name.replace(/[^a-zA-Z0-9-_\.]/g, "_");
+      const fileName = `${safeName}.enc`;
 
       // Check if file already exists in storage
       const { data: existingFiles, error: existingError } =
