@@ -1,10 +1,11 @@
 "use client";
 
-import { useState } from "react";
+import { useState, useEffect } from "react";
 import { NoSecurity, Rocket, Secure, Server } from "@/icons";
 import { Toaster, toast } from "sonner";
 import { verifyPasskey, decryptFile, fromBase64 } from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
+import { useQueryState } from "nuqs";
 import axios from "axios";
 
 export default function DownloadPage() {
@@ -17,16 +18,19 @@ export default function DownloadPage() {
   const [statusMessage, setStatusMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
 
+  const [queryName, setQueryName] = useQueryState("name");
+  const [queryKey, setQueryKey] = useQueryState("key");
+
   /**
    * Handles the file download process with progress tracking
    */
   const handleDownload = async () => {
     // Validate inputs
-    if (!name) {
+    if (!name && !queryName) {
       toast.error("Please enter a name");
       return;
     }
-    if (!key) {
+    if (!key && !queryKey) {
       toast.error("Please enter a key");
       return;
     }
@@ -127,9 +131,16 @@ export default function DownloadPage() {
     }
   };
 
+  useEffect(() => {
+    if (queryName && queryKey) {
+      setName(queryName);
+      setKey(queryKey);
+    }
+  }, []);
+
   return (
     <div className="min-h-screen flex flex-col">
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" />
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
@@ -173,7 +184,7 @@ export default function DownloadPage() {
                     </label>
                     <input
                       className="h-12 rounded-lg border bg-black text-lg border-white/20 px-2 focus:outline-none focus:ring-2 focus:ring-white/50"
-                      value={key}
+                      value={name}
                       onChange={(e) => setKey(e.target.value)}
                       id="key"
                       name="key"
@@ -186,7 +197,7 @@ export default function DownloadPage() {
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="px-4 py-2 rounded-md text-center relative overflow-hidden bg-white/90 cursor-pointer dark:bg-black dark:text-white text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-md text-center relative overflow-hidden  cursor-pointer bg-white/90 text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <div
                   style={{ width: `${uploadProgress}%` }}

@@ -12,6 +12,21 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { Copy } from "lucide-react";
+
+import { Button } from "@/components/ui/button";
+import {
+  Dialog,
+  DialogClose,
+  DialogContent,
+  DialogDescription,
+  DialogFooter,
+  DialogHeader,
+  DialogTitle,
+  DialogTrigger,
+} from "@/components/ui/dialog";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
 
 import axios from "axios";
 
@@ -39,6 +54,8 @@ export default function UploadFile() {
   // State for upload process
   const [uploadProgress, setUploadProgress] = useState(0);
   const [isUploading, setIsUploading] = useState(false);
+  const [showShareDialog, setShowShareDialog] = useState(false);
+  const [shareLink, setShareLink] = useState("");
 
   /**
    * Handles drag over event for the drop zone
@@ -180,7 +197,11 @@ export default function UploadFile() {
 
       if (!metaResult.success) throw new Error(metaResult.error);
 
-      toast.success("File uploaded successfully!");
+      // Generate and show share link
+      const generatedShareLink = `https://updo.vercel.app/download?name=${name}&key=${key}`;
+      setShareLink(generatedShareLink);
+      setShowShareDialog(true);
+
       console.log("Upload complete:", uploadResult.filePath);
     } catch (error) {
       toast.error("Upload failed: " + error.message);
@@ -188,6 +209,14 @@ export default function UploadFile() {
     } finally {
       setIsUploading(false);
     }
+  };
+
+  /**
+   * Copies the share link to clipboard
+   */
+  const copyShareLink = () => {
+    navigator.clipboard.writeText(shareLink);
+    toast.success("Link copied to clipboard!");
   };
 
   /**
@@ -290,7 +319,7 @@ export default function UploadFile() {
 
   return (
     <div className="min-h-screen flex flex-col">
-      <Toaster position="top-center" richColors />
+      <Toaster position="top-center" />
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
@@ -377,7 +406,7 @@ export default function UploadFile() {
                       />
                     </div>
                   </div>
-                  <div className="mt-8 flex items-center  justify-between text-lg">
+                  <div className="mt-4 flex items-center  justify-between text-lg">
                     Delete after
                     <div>
                       <Select
@@ -462,7 +491,6 @@ export default function UploadFile() {
           <a
             href="rayid.vercel.app"
             target="_blank"
-            rel="noopener noreferrer"
             className="underline cursor-pointer hover:text-white/80 transition-colors"
           >
             Rayid
@@ -472,6 +500,45 @@ export default function UploadFile() {
           © {new Date().getFullYear()} Updo. All rights reserved.
         </div>
       </footer>
+
+      <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
+        <DialogContent className="sm:max-w-md">
+          <DialogHeader>
+            <DialogTitle>File uploaded successfully!</DialogTitle>
+            <DialogDescription>
+              You can share this file with others
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex items-center space-x-2">
+            <div className="grid flex-1 gap-2">
+              <Label htmlFor="link" className="sr-only">
+                Link
+              </Label>
+              <Input id="link" value={shareLink} readOnly />
+            </div>
+            <Button
+              type="submit"
+              size="sm"
+              className="px-3 cursor-pointer"
+              onClick={copyShareLink}
+            >
+              <span className="sr-only">Copy</span>
+              <Copy />
+            </Button>
+          </div>
+          <DialogFooter className="sm:justify-start">
+            <DialogClose asChild>
+              <Button
+                type="button"
+                className="cursor-pointer"
+                variant="secondary"
+              >
+                Close
+              </Button>
+            </DialogClose>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
     </div>
   );
 }

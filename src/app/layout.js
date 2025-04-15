@@ -1,6 +1,7 @@
 import { Poppins } from "next/font/google";
 import "./globals.css";
 import Script from "next/script";
+import { NuqsAdapter } from "nuqs/adapters/next/app";
 
 const poppins = Poppins({
   variable: "--font-poppins",
@@ -23,7 +24,9 @@ export default function RootLayout({ children }) {
           data-website-id="3aabfa19-c9b7-4e41-95f3-a65817975c25"
         />
       </head>
-      <body className="antialiased">{children}</body>
+      <body className="antialiased">
+        <NuqsAdapter>{children}</NuqsAdapter>
+      </body>
     </html>
   );
 }
