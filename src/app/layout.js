@@ -16,15 +16,14 @@ export const metadata = {
 export default function RootLayout({ children }) {
   return (
     <html lang="en" className={`dark ${poppins.variable}`}>
-      <head />
-      <body className="antialiased">
+      <head>
         <Script
           defer
           src="https://cloud.umami.is/script.js"
           data-website-id="3aabfa19-c9b7-4e41-95f3-a65817975c25"
         />
-        {children}
-      </body>
+      </head>
+      <body className="antialiased">{children}</body>
     </html>
   );
 }
