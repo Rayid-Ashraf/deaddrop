@@ -4,7 +4,7 @@ import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import { encryptFile, toBase64 } from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
-import { NoSecurity, Rocket, Secure, Server, Upload } from "@/icons";
+import { Rocket, Upload } from "@/icons";
 import {
   Select,
   SelectContent,
@@ -30,6 +30,7 @@ import { Label } from "@/components/ui/label";
 
 import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
+import HeroText from "@/components/text";
 
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
@@ -336,11 +337,11 @@ export default function UploadFile() {
       </header>
 
       {/* Main Content */}
-      <main className="flex-grow my-24 px-6 xl:px-32">
+      <main className="flex-grow my-24 px-4 xl:px-32">
         <div className="flex flex-col items-center justify-between gap-20 xl:gap-28 max-w-[480px] m-auto lg:flex-row lg:max-w-none lg:h-[68vh]">
           {/* File Upload Section */}
           <div
-            className={`flex lg:w-[50%] border-dashed-svg rounded-3xl p-6 m-auto w-full max-w-[440px] h-[480px] transition-colors duration-200 ${
+            className={`flex lg:w-[50%] border-dashed-svg rounded-3xl p-5 m-auto w-full max-w-[440px] h-[480px] transition-colors duration-200 ${
               isDragging ? "bg-[#202020]" : "bg-[#101010]"
             }`}
             onDragOver={handleDragOver}
@@ -458,32 +459,7 @@ export default function UploadFile() {
           </div>
 
           {/* Information Section */}
-          <div className="lg:w-[50%]">
-            <h1 className="text-5xl font-bold leading-[50px] xl:leading-[64px]">
-              Access your Files <br className="hidden xl:block" />
-              Anytime, Anywhere
-            </h1>
-            <p className="text-white/90 mt-6">
-              With Updo, securely upload your files to the cloud and access them
-              easily from any device. Simply assign a name and key to your file,
-              and retrieve it whenever needed by entering those details in your
-              browser.
-            </p>
-            <div className="mt-8 flex flex-col gap-3">
-              <div className="flex items-center gap-2 text-xl font-semibold">
-                <Server />
-                Upload file up to {MAX_FILE_SIZE_MB} MB for free
-              </div>
-              <div className="flex items-center gap-2 text-xl font-semibold">
-                <NoSecurity />
-                No account required — just upload and share
-              </div>
-              <div className="flex items-center gap-2 text-xl font-semibold">
-                <Secure />
-                End-to-end encryption for complete security
-              </div>
-            </div>
-          </div>
+          <HeroText />
         </div>
       </main>
 

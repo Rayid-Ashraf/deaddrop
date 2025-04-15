@@ -6,7 +6,7 @@ export default function AnnouncementBar() {
   const [show, setShow] = useState(true);
   return (
     <div
-      className={`bg-white/80 text-black  px-4 py-6  items-center justify-between gap-8  ${
+      className={`bg-white/80 text-black  px-4 py-6  items-center justify-between gap-4  ${
         show ? "flex" : "hidden"
       }`}
     >
