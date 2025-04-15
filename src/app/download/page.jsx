@@ -7,6 +7,7 @@ import { verifyPasskey, decryptFile, fromBase64 } from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
 import { useQueryState } from "nuqs";
 import axios from "axios";
+import AnnouncementBar from "@/components/announcement-bar";
 
 export default function DownloadPage() {
   // Form state
@@ -141,6 +142,7 @@ export default function DownloadPage() {
   return (
     <div className="min-h-screen flex flex-col">
       <Toaster position="top-center" />
+      <AnnouncementBar />
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
@@ -254,7 +256,6 @@ export default function DownloadPage() {
           <a
             href="https://rayid.vercel.app"
             target="_blank"
-            rel="noopener noreferrer"
             className="underline cursor-pointer hover:text-white/80 transition-colors"
           >
             Rayid

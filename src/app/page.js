@@ -29,6 +29,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 
 import axios from "axios";
+import AnnouncementBar from "@/components/announcement-bar";
 
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
@@ -321,6 +322,7 @@ export default function UploadFile() {
   return (
     <div className="min-h-screen flex flex-col">
       <Toaster position="top-center" />
+      <AnnouncementBar />
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
@@ -490,7 +492,7 @@ export default function UploadFile() {
         <div className="text-lg">
           Designed and developed by{" "}
           <a
-            href="rayid.vercel.app"
+            href="https://rayid.vercel.app"
             target="_blank"
             className="underline cursor-pointer hover:text-white/80 transition-colors"
           >
