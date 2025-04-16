@@ -187,7 +187,7 @@ export default function DownloadPage() {
                     </label>
                     <input
                       className="h-12 rounded-lg border bg-black text-lg border-white/20 px-2 focus:outline-none focus:ring-2 focus:ring-white/50"
-                      value={name}
+                      value={key}
                       onChange={(e) => setKey(e.target.value)}
                       id="key"
                       name="key"
