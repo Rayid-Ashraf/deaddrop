@@ -200,7 +200,7 @@ export default function UploadFile() {
       if (!metaResult.success) throw new Error(metaResult.error);
 
       // Generate and show share link
-      const generatedShareLink = `https://updo.vercel.app/download?name=${name}&key=${key}`;
+      const generatedShareLink = `https://Deaddrop.vercel.app/download?name=${name}&key=${key}`;
       setShareLink(generatedShareLink);
       setShowShareDialog(true);
 
@@ -327,7 +327,12 @@ export default function UploadFile() {
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
-        <div className="text-4xl font-bold tracking-tighter">UPDO</div>
+        <div className="text-4xl font-bold tracking-tighter">
+          DeadDrop
+          <span className="text-lg font-normal opacity-90 tracking-normal">
+            .space
+          </span>
+        </div>
         <a
           href="/download"
           className="bg-white/90 cursor-pointer h-10 rounded-md text-black w-40 font-medium text-lg flex items-center justify-center hover:bg-white transition-colors"
@@ -476,7 +481,7 @@ export default function UploadFile() {
           </a>
         </div>
         <div className="text-lg">
-          © {new Date().getFullYear()} Updo. All rights reserved.
+          © {new Date().getFullYear()} Deaddrop. All rights reserved.
         </div>
       </footer>
 

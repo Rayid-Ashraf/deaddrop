@@ -9,7 +9,7 @@ export default function HeroText() {
         No Signups, No Stress
       </h1>
       <p className="text-white/90 mt-6">
-        Updo lets you send files securely and anonymously. Just upload your
+        Deaddrop lets you send files securely and anonymously. Just upload your
         file, give it a name, set a key, and share the name and key — or simply
         send a direct link. It’s that simple.
       </p>
