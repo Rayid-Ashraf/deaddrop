@@ -11,9 +11,9 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "Updo — Share Files Securely",
+  title: "DeadDrop — Share Files Securely",
   description:
-    "Updo lets you send files securely and anonymously. Just upload your file, give it a name, set a key, and share the name and key — or simply send a direct link. It’s that simple.",
+    "DeadDrop lets you send files securely and anonymously. Just upload your file, give it a name, set a key, and share the name and key — or simply send a direct link. It’s that simple.",
 };
 
 export default function RootLayout({ children }) {
@@ -26,7 +26,7 @@ export default function RootLayout({ children }) {
           data-website-id="3aabfa19-c9b7-4e41-95f3-a65817975c25"
         />
       </head>
-      <body className="antialiased">
+      <body className="bg-black">
         <Suspense
           fallback={
             <div className="text-white text-center h-screen w-screen flex items-center justify-center bg-black">
