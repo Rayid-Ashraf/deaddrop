@@ -155,12 +155,17 @@ export default function DownloadPage() {
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
-        <div className="text-4xl font-bold tracking-tighter">
-          DeadDrop
-          <span className="text-lg font-normal opacity-90 tracking-normal">
-            .space
-          </span>
-        </div>{" "}
+        <a
+          href="/"
+          className="text-4xl font-bold  cursor-pointer tracking-tighter"
+        >
+          <div className="flex items-end">
+            DeadDrop
+            <span className="text-lg font-normal opacity-90 tracking-normal hidden sm:block">
+              .space
+            </span>
+          </div>
+        </a>
         <a
           href="/"
           className="bg-white/90 cursor-pointer h-10 rounded-md text-black w-40 font-medium text-lg flex items-center justify-center hover:bg-white transition-colors"
