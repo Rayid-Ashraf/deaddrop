@@ -14,6 +14,7 @@ import { useQueryState } from "nuqs";
 import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
 import HeroText from "@/components/text";
+import Link from "next/link";
 
 export default function DownloadPage() {
   // Form state
@@ -155,23 +156,21 @@ export default function DownloadPage() {
 
       {/* Header */}
       <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
-        <a
-          href="/"
-          className="text-4xl font-bold  cursor-pointer tracking-tighter"
-        >
-          <div className="flex items-end">
-            DeadDrop
-            <span className="text-lg font-normal opacity-90 tracking-normal hidden sm:block">
-              .space
-            </span>
+        <Link href="/" passHref>
+          <div className="text-4xl font-bold cursor-pointer tracking-tighter">
+            <div className="flex items-end">
+              DeadDrop
+              <span className="text-lg font-normal opacity-90 tracking-normal hidden sm:block">
+                .space
+              </span>
+            </div>
           </div>
-        </a>
-        <a
-          href="/"
-          className="bg-white/90 cursor-pointer h-10 rounded-md text-black w-40 font-medium text-lg flex items-center justify-center hover:bg-white transition-colors"
-        >
-          Upload file
-        </a>
+        </Link>
+        <Link href="/" passHref>
+          <button className="bg-white/90 cursor-pointer h-10 rounded-md text-black w-40 font-medium text-lg flex items-center justify-center hover:bg-white transition-colors">
+            Upload file
+          </button>
+        </Link>
       </header>
 
       {/* Main Content */}
@@ -218,7 +217,7 @@ export default function DownloadPage() {
               <button
                 onClick={handleDownload}
                 disabled={isDownloading}
-                className="px-4 py-2 rounded-md text-center relative overflow-hidden  cursor-pointer bg-white/90 text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
+                className="px-4 py-2 rounded-md text-center relative overflow-hidden cursor-pointer bg-white/90 text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
               >
                 <div
                   style={{ width: `${uploadProgress}%` }}
@@ -247,13 +246,11 @@ export default function DownloadPage() {
       <footer className="flex flex-col justify-between items-center xl:px-32 gap-1 pb-2 lg:flex-row lg:px-10">
         <div className="text-lg">
           Designed and developed by{" "}
-          <a
-            href="https://rayid.vercel.app"
-            target="_blank"
-            className="underline cursor-pointer hover:text-white/80 transition-colors"
-          >
-            Rayid
-          </a>
+          <Link href="https://rayid.vercel.app" target="_blank" passHref>
+            <span className="underline cursor-pointer hover:text-white/80 transition-colors">
+              Rayid
+            </span>
+          </Link>
         </div>
         <div className="text-lg">
           © {new Date().getFullYear()} Deaddrop. All rights reserved.
