@@ -3,7 +3,12 @@
 import { useState, useEffect } from "react";
 import { Rocket } from "@/icons";
 import { Toaster, toast } from "sonner";
-import { verifyPasskey, decryptFile, fromBase64 } from "@/utils/encryption";
+import {
+  verifyPasskey,
+  decryptFile,
+  fromBase64,
+  decryptPasskey,
+} from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
 import { useQueryState } from "nuqs";
 import axios from "axios";
@@ -135,8 +140,11 @@ export default function DownloadPage() {
 
   useEffect(() => {
     if (queryName && queryKey) {
-      setName(queryName);
-      setKey(queryKey);
+      const safeName = decodeURIComponent(queryName);
+      const safeQueryKey = decodeURIComponent(queryKey);
+      const decryptedKey = decryptPasskey(safeQueryKey);
+      setName(safeName);
+      setKey(decryptedKey);
     }
   }, []);
 

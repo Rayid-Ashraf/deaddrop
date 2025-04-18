@@ -1,3 +1,5 @@
+import CryptoJS from "crypto-js";
+
 export const encryptFile = async (file, passkey) => {
   const salt = crypto.getRandomValues(new Uint8Array(16));
   const iv = crypto.getRandomValues(new Uint8Array(12));
@@ -99,4 +101,15 @@ export const fromBase64 = (base64) => {
 
 export const toBase64 = (buffer) => {
   return btoa(String.fromCharCode(...new Uint8Array(buffer)));
+};
+
+export const encryptPasskey = (passkey) => {
+  const encrypted = CryptoJS.AES.encrypt(passkey, "DD#pXv@q2S").toString();
+  return encrypted;
+};
+
+export const decryptPasskey = (encryptedPasskey) => {
+  const bytes = CryptoJS.AES.decrypt(encryptedPasskey, "DD#pXv@q2S");
+  const decrypted = bytes.toString(CryptoJS.enc.Utf8);
+  return decrypted;
 };

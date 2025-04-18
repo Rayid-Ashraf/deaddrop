@@ -2,7 +2,7 @@
 
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
-import { encryptFile, toBase64 } from "@/utils/encryption";
+import { encryptFile, encryptPasskey, toBase64 } from "@/utils/encryption";
 import { supabase } from "@/libs/supabase";
 import { Rocket, Upload } from "@/icons";
 import {
@@ -200,7 +200,11 @@ export default function UploadFile() {
       if (!metaResult.success) throw new Error(metaResult.error);
 
       // Generate and show share link
-      const generatedShareLink = `https://Deaddrop.vercel.app/download?name=${name}&key=${key}`;
+      const encryptedKey = encryptPasskey(key);
+      const safeEncryptedKey = encodeURIComponent(encryptedKey);
+      const safeName = encodeURIComponent(name);
+
+      const generatedShareLink = `https://deaddrop.space/download?name=${safeName}&key=${safeEncryptedKey}`;
       setShareLink(generatedShareLink);
       setShowShareDialog(true);
 
