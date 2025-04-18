@@ -3,7 +3,7 @@
 import { use, useState } from "react";
 
 export default function AnnouncementBar() {
-  const [show, setShow] = useState(true);
+  const [show, setShow] = useState(false);
   return (
     <div
       className={`bg-white/80 text-black  px-4 py-6  items-center justify-between gap-4  ${
