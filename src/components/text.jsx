@@ -1,5 +1,6 @@
 import React from "react";
 import { Server, NoSecurity, Secure } from "@/icons";
+
 export default function HeroText() {
   return (
     <div className="lg:w-[50%]">
@@ -10,8 +11,8 @@ export default function HeroText() {
       </h1>
       <p className="text-white/90 mt-6">
         Deaddrop lets you send files securely and anonymously. Just upload your
-        file, give it a name, set a key, and share the name and key — or simply
-        send a direct link. It’s that simple.
+        file, give it a name, set a password, and share the name and password —
+        or simply send a direct link. It’s that simple.
       </p>
       <div className="mt-8 flex flex-col gap-3">
         <div className="flex items-center gap-2 text-xl font-semibold">

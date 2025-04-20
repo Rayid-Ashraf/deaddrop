@@ -200,7 +200,7 @@ export default function DownloadPage() {
                   </div>
                   <div className="flex flex-col w-full">
                     <label htmlFor="key" className="text-white/90">
-                      Key
+                      Password
                     </label>
                     <input
                       className="h-12 rounded-lg border bg-black text-lg border-white/20 px-2 focus:outline-none focus:ring-2 focus:ring-white/50"
