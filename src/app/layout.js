@@ -11,7 +11,7 @@ const poppins = Poppins({
 });
 
 export const metadata = {
-  title: "DeadDrop — Share Files Securely",
+  title: "DeadDrop - Share Files Securely",
   description:
     "DeadDrop lets you send files securely and anonymously. Just upload your file, give it a name, set a key, and share the name and key — or simply send a direct link. It’s that simple.",
 };

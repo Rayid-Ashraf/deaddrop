@@ -113,3 +113,21 @@ export function Rocket() {
     </svg>
   );
 }
+
+export function Logo() {
+  return (
+    <svg
+      width="36"
+      height="36"
+      viewBox="0 0 40 40"
+      fill="none"
+      xmlns="http://www.w3.org/2000/svg"
+    >
+      <rect width="40" height="40" rx="20" fill="white" />
+      <path
+        d="M20 11C20 11 27 17 27 23C27 25 26 29 20 29M20 11C20 11 13 17 13 23C13 25 14 29 20 29"
+        fill="black"
+      />
+    </svg>
+  );
+}
