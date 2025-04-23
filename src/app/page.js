@@ -53,6 +53,7 @@ export default function UploadFile() {
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [expiryDays, setExpiryDays] = useState(30);
+  const [maxDownloads, setMaxDownloads] = useState(null);
 
   // State for upload process
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -442,6 +443,29 @@ export default function UploadFile() {
                           <SelectItem value="7">7 days</SelectItem>
                           <SelectItem value="15">15 days</SelectItem>
                           <SelectItem value="30">30 days</SelectItem>
+                        </SelectContent>
+                      </Select>
+                    </div>
+                  </div>
+                  <div className="mt-4 flex items-center justify-between text-lg">
+                    Maximum downloads
+                    <div>
+                      <Select
+                        value={expiryDays.toString()}
+                        onValueChange={(value) =>
+                          setMaxDownloads(parseInt(value))
+                        }
+                      >
+                        {" "}
+                        <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
+                          <SelectValue placeholder="30 days" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="1">1</SelectItem>
+                          <SelectItem value="10">10</SelectItem>
+                          <SelectItem value="100">100</SelectItem>
+                          <SelectItem value="1000">1000</SelectItem>
+                          <SelectItem value="0">Infinite</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
