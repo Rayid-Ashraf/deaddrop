@@ -53,7 +53,7 @@ export default function UploadFile() {
   const [name, setName] = useState("");
   const [key, setKey] = useState("");
   const [expiryDays, setExpiryDays] = useState(30);
-  const [maxDownloads, setMaxDownloads] = useState(null);
+  const [maxDownloads, setMaxDownloads] = useState(100000);
 
   // State for upload process
   const [uploadProgress, setUploadProgress] = useState(0);
@@ -259,6 +259,8 @@ export default function UploadFile() {
           file_path: filePath,
           download_url: downloadUrl,
           expiry_days: expiryDays,
+          max_downloads: maxDownloads,
+          downloads: 0,
         },
       ]);
 
@@ -451,21 +453,21 @@ export default function UploadFile() {
                     Maximum downloads
                     <div>
                       <Select
-                        value={expiryDays.toString()}
+                        value={maxDownloads.toString()}
                         onValueChange={(value) =>
                           setMaxDownloads(parseInt(value))
                         }
                       >
                         {" "}
                         <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
-                          <SelectValue placeholder="30 days" />
+                          <SelectValue placeholder="Infinite downloads" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="1">1</SelectItem>
                           <SelectItem value="10">10</SelectItem>
                           <SelectItem value="100">100</SelectItem>
                           <SelectItem value="1000">1000</SelectItem>
-                          <SelectItem value="0">Infinite</SelectItem>
+                          <SelectItem value="100000">Infinite</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>

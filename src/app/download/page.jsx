@@ -52,7 +52,7 @@ export default function DownloadPage() {
       const { data, error } = await supabase
         .from("metadata")
         .select(
-          "file_name, encrypted_verification, salt, iv, verification_IV, download_url"
+          "file_name, encrypted_verification, salt, iv, verification_IV, download_url, max_downloads, downloads"
         )
         .eq("name", name)
         .single();
@@ -68,6 +68,8 @@ export default function DownloadPage() {
         iv,
         verification_IV,
         download_url,
+        max_downloads,
+        downloads,
       } = data;
 
       // Convert base64 strings to Uint8Arrays
@@ -87,6 +89,23 @@ export default function DownloadPage() {
 
       if (!isValid) {
         throw new Error("Invalid key provided");
+      }
+
+      if (downloads >= max_downloads) {
+        toast.error(
+          "This file has been permanently deleted as it exceeded the maximum number of allowed downloads."
+        );
+        return;
+      } else {
+        const updatedCount = downloads + 1;
+        const { error: updateError } = await supabase
+          .from("metadata")
+          .update({ downloads: updatedCount })
+          .eq("name", name);
+
+        if (updateError) {
+          console.error("Error updating downloads:", updateError);
+        }
       }
 
       // Download the encrypted file with progress tracking
