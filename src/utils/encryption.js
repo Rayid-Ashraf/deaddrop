@@ -1,4 +1,5 @@
 import CryptoJS from "crypto-js";
+const SECRET_KEY = process.env.NEXT_PUBLIC_PASSKEY_SECRET;
 
 export const encryptFile = async (file, passkey) => {
   const salt = crypto.getRandomValues(new Uint8Array(16));
@@ -104,12 +105,12 @@ export const toBase64 = (buffer) => {
 };
 
 export const encryptPasskey = (passkey) => {
-  const encrypted = CryptoJS.AES.encrypt(passkey, "DD#pXv@q2S").toString();
+  const encrypted = CryptoJS.AES.encrypt(passkey, SECRET_KEY).toString();
   return encrypted;
 };
 
 export const decryptPasskey = (encryptedPasskey) => {
-  const bytes = CryptoJS.AES.decrypt(encryptedPasskey, "DD#pXv@q2S");
+  const bytes = CryptoJS.AES.decrypt(encryptedPasskey, SECRET_KEY);
   const decrypted = bytes.toString(CryptoJS.enc.Utf8);
   return decrypted;
 };
