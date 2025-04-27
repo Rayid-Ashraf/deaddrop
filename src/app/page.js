@@ -32,6 +32,7 @@ import Link from "next/link";
 import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
 import HeroText from "@/components/text";
+import Header from "@/components/header";
 
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
@@ -334,26 +335,10 @@ export default function UploadFile() {
       <AnnouncementBar />
 
       {/* Header */}
-      <header className="h-16 lg:h-20 xl:px-32 border-b border-white/30 flex justify-between items-center px-4 lg:px-10">
-        <Link href="/" passHref>
-          <div className="text-4xl font-bold cursor-pointer tracking-tighter">
-            <div className="flex items-end">
-              DeadDrop
-              <span className="text-lg font-normal opacity-90 tracking-normal hidden sm:block">
-                .space
-              </span>
-            </div>
-          </div>
-        </Link>
-        <Link href="/download" passHref>
-          <button className="bg-white/90 cursor-pointer h-10 rounded-md text-black w-40 font-medium text-lg flex items-center justify-center hover:bg-white transition-colors">
-            Download file
-          </button>
-        </Link>
-      </header>
+      <Header page="upload" />
 
       {/* Main Content */}
-      <main className="flex-grow my-24 px-4 xl:px-32">
+      <main className="flex-grow mt-24 px-4 xl:px-32">
         <div className="flex flex-col items-center justify-between gap-20 xl:gap-28 max-w-[480px] m-auto lg:flex-row lg:max-w-none lg:h-[68vh]">
           {/* File Upload Section */}
           <div
