@@ -1,10 +1,11 @@
 import Article from "@/components/article";
 import Header from "@/components/header";
 import { Client } from "@notionhq/client";
+import { cache } from "react";
 
 const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_TOKEN });
 
-async function getArticles() {
+const getArticles = cache(async () => {
   const databaseId = "1e3ba73e900f80a5a7f3fe954c3d1e06";
 
   const response = await notion.databases.query({
@@ -34,7 +35,9 @@ async function getArticles() {
       date: rawDate || "No date",
     };
   });
-}
+});
+
+export const revalidate = 60;
 
 export default async function Page() {
   const articles = await getArticles();
