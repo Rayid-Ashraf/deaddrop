@@ -33,6 +33,7 @@ import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
 import HeroText from "@/components/text";
 import Header from "@/components/header";
+import Footer from "@/components/footer";
 
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
@@ -488,19 +489,7 @@ export default function UploadFile() {
       </main>
 
       {/* Footer */}
-      <footer className="flex flex-col justify-between items-center xl:px-32 gap-1 pb-2 lg:flex-row lg:px-10">
-        <div className="text-lg">
-          Designed and developed by{" "}
-          <Link target="_blank" href="https://rayid.vercel.app" passHref>
-            <span className="underline cursor-pointer hover:text-white/80 transition-colors">
-              Rayid
-            </span>
-          </Link>
-        </div>
-        <div className="text-lg">
-          © {new Date().getFullYear()} Deaddrop. All rights reserved.
-        </div>
-      </footer>
+      <Footer />
 
       <Dialog open={showShareDialog} onOpenChange={setShowShareDialog}>
         <DialogContent className="sm:max-w-md">

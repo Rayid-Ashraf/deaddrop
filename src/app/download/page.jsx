@@ -179,7 +179,7 @@ export default function DownloadPage() {
       <Header page="download" />
 
       {/* Main Content */}
-      <main className="flex-grow my-24 px-4 xl:px-32">
+      <main className="flex-grow mt-24 px-4 xl:px-32">
         <div className="flex flex-col items-center justify-between gap-20 xl:gap-28 max-w-[480px] m-auto lg:flex-row lg:max-w-none lg:h-[68vh]">
           {/* Download Form Section */}
           <div className="flex lg:w-[50%] border-dashed-svg rounded-3xl p-5 m-auto w-full max-w-[440px] h-[480px] duration-200 bg-[#101010]">

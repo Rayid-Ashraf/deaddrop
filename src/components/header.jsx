@@ -15,7 +15,7 @@ export default function Header({ page }) {
     <div>
       <header
         className={`h-20 lg:h-20 xl:px-32 border-b  flex justify-between items-center px-4 lg:px-10 transition-all duration-500 ease-in-out ${
-          isMenuOpen ? "border-white/0" : "border-white/30"
+          isMenuOpen ? "border-white/0" : "border-white/20"
         }`}
       >
         <Link href="/" passHref>
@@ -52,7 +52,7 @@ export default function Header({ page }) {
                 About
               </div>
             </Link>
-            {/* <Link href="./">
+            <Link href="/articles">
               <div
                 className={`pr-12 transition-all duration-300 ease-in-out hover:opacity-100 ${
                   page === "articles" ? "opacity-100 font-medium" : "opacity-80"
@@ -60,7 +60,7 @@ export default function Header({ page }) {
               >
                 Articles
               </div>
-            </Link> */}
+            </Link>
           </div>
 
           {page == "upload" ? (
@@ -127,14 +127,14 @@ export default function Header({ page }) {
 
       {/* Mobile Menu Dropdown with Smooth Transition */}
       <div
-        className={`md:hidden bg-black/95 border-b border-white/30 overflow-hidden transition-all duration-500 ease-in-out ${
+        className={`md:hidden bg-black/95 border-b border-white/20 overflow-hidden transition-all duration-500 ease-in-out ${
           isMenuOpen ? "max-h-64 opacity-100" : "max-h-0 opacity-0"
         }`}
       >
-        <div className="flex flex-col py-4 px-4">
+        <div className="flex flex-col py-4 px-4 items-center">
           <Link href="/">
             <div
-              className={`py-3 transition-all duration-300 ease-in-out hover:opacity-100 ${
+              className={`py-3 transition-all duration-300 ease-in-out text-lg hover:opacity-100 ${
                 page === "home" || page === "upload" || page === "download"
                   ? "opacity-100 font-medium"
                   : "opacity-70"
@@ -146,7 +146,7 @@ export default function Header({ page }) {
           </Link>
           <Link href="/about">
             <div
-              className={`py-3 transition-all duration-300 ease-in-out hover:opacity-100 ${
+              className={`py-3 transition-all duration-300 ease-in-out text-lg hover:opacity-100 ${
                 page === "about"
                   ? "opacity-100 text-white font-medium"
                   : "opacity-80"
@@ -156,16 +156,16 @@ export default function Header({ page }) {
               About
             </div>
           </Link>
-          {/* <Link href="./">
+          <Link href="/articles">
             <div
-              className={`py-3 transition-all duration-300 ease-in-out hover:opacity-100 ${
+              className={`py-3 transition-all duration-300 ease-in-out text-lg hover:opacity-100 ${
                 page === "articles" ? "opacity-100 font-medium" : "opacity-80"
               }`}
               onClick={toggleMenu}
             >
               Articles
             </div>
-          </Link> */}
+          </Link>
         </div>
       </div>
     </div>

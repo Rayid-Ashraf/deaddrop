@@ -7,7 +7,7 @@ export default function Page() {
     <div className="text-white">
       <Header page="about" />
       <div className="max-w-[720px] mx-auto px-4 mt-12">
-        <h1 className="text-5xl font-extrabold mb-8 ">About</h1>
+        <h1 className="text-5xl font-bold mb-8 ">About</h1>
 
         <p className="text-xl mb-5">
           <span className="font-bold tracking-wide">DeadDrop</span> is a simple,
