@@ -12,7 +12,7 @@ export default function Page() {
   useEffect(() => {
     const fetchPageData = async () => {
       try {
-        const res = await fetch("/api/notion/page", {
+        const res = await fetch("https://deaddrop.space/api/notion/page", {
           method: "POST",
           headers: {
             "Content-Type": "application/json",

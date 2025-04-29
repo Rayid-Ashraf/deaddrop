@@ -1,20 +1,43 @@
 import Article from "@/components/article";
 import Header from "@/components/header";
+import { Client } from "@notionhq/client";
 
-export const dynamic = "force-static"; // Optional
+const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_TOKEN });
 
-export default async function Page() {
+async function getArticles() {
   const databaseId = "1e3ba73e900f80a5a7f3fe954c3d1e06";
 
-  const res = await fetch(`https://deaddrop.space/api/notion/database`, {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
+  const response = await notion.databases.query({
+    database_id: databaseId,
+    filter: {
+      property: "Status",
+      select: {
+        equals: "Published",
+      },
     },
-    body: JSON.stringify({ databaseId }),
+    sorts: [
+      {
+        property: "Published on",
+        direction: "descending",
+      },
+    ],
   });
 
-  const { data: articles = [] } = await res.json();
+  return response.results.map((page) => {
+    const titleProp = page.properties.Title || page.properties.Name;
+    const dateProp = page.properties["Published on"];
+    const rawDate = dateProp?.date?.start;
+
+    return {
+      id: page.id,
+      title: titleProp?.title?.[0]?.plain_text || "Untitled",
+      date: rawDate || "No date",
+    };
+  });
+}
+
+export default async function Page() {
+  const articles = await getArticles();
 
   return (
     <div>
@@ -27,11 +50,15 @@ export default async function Page() {
               key={article.id}
               id={article.id}
               title={article.title}
-              date={new Date(article.date).toLocaleDateString("en-GB", {
-                day: "2-digit",
-                month: "long",
-                year: "numeric",
-              })}
+              date={
+                article.date !== "No date"
+                  ? new Date(article.date).toLocaleDateString("en-GB", {
+                      day: "2-digit",
+                      month: "long",
+                      year: "numeric",
+                    })
+                  : "No date"
+              }
             />
           ))}
         </div>
