@@ -89,8 +89,33 @@ export default function UploadFile() {
     e.preventDefault();
     setIsDragging(false);
     const files = e.dataTransfer.files;
-    if (files.length > 0) {
+    if (files.length == 1) {
       handleFile(files[0]);
+    } else if (files.length > 1) {
+      toast.error(
+        "Multiple files not supported. Please paste one file at a time."
+      );
+      return;
+    }
+  };
+
+  /**
+   * Handles file paste event
+   * @param {React.ClipboardEvent} e - The paste event
+   */
+  const handlePaste = (e) => {
+    const items = e.clipboardData.items;
+    for (let i = 0; i < items.length; i++) {
+      if (
+        items[i].type.indexOf("image") !== -1 ||
+        items[i].type.indexOf("file") !== -1
+      ) {
+        const file = items[i].getAsFile();
+        if (file) {
+          handleFile(file);
+          break;
+        }
+      }
     }
   };
 
@@ -114,6 +139,8 @@ export default function UploadFile() {
       toast.error(`File size must be less than ${MAX_FILE_SIZE_MB}MB`);
       return;
     }
+
+    console.log(file);
 
     setSelectedFile(file);
     setFileName(file.name);
@@ -349,6 +376,7 @@ export default function UploadFile() {
             onDragOver={handleDragOver}
             onDragLeave={handleDragLeave}
             onDrop={handleDrop}
+            onPaste={handlePaste}
           >
             {!selectedFile ? (
               // Stage 1 - File Selection
