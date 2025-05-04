@@ -1,51 +1,59 @@
-"use client";
+import { Client } from "@notionhq/client";
+import { cache } from "react";
 
-import { useParams } from "next/navigation";
-import { useEffect, useState } from "react";
+const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_TOKEN });
 
-export default function Page() {
-  const { id } = useParams();
-  const [pageData, setPageData] = useState(null);
-  const [loading, setLoading] = useState(true);
-  const [publishedDate, setPublishedDate] = useState("");
+const getPageData = cache(async (pageId) => {
+  const page = await notion.pages.retrieve({ page_id: pageId });
+  const blocks = await notion.blocks.children.list({ block_id: pageId });
 
-  useEffect(() => {
-    const fetchPageData = async () => {
-      try {
-        const res = await fetch("/api/notion/page", {
-          method: "POST",
-          headers: {
-            "Content-Type": "application/json",
-          },
-          body: JSON.stringify({ pageId: id }),
-        });
+  const titleProperty = page.properties?.Title || page.properties?.Name;
+  const publishedOnProperty = page.properties?.["Published on"];
 
-        const result = await res.json();
+  const title = titleProperty?.title?.[0]?.plain_text || "Untitled";
+  const publishedOn = publishedOnProperty?.date?.start || null;
 
-        if (result.success) {
-          setPageData(result.data);
-          const publishedOn = new Date(
-            result.data.publishedOn
-          ).toLocaleDateString("en-GB", {
-            day: "2-digit",
-            month: "long",
-            year: "numeric",
-          });
-          setPublishedDate(publishedOn);
-        } else {
-          console.error("Failed to fetch page:", result.error);
-        }
-      } catch (error) {
-        console.error("Error fetching page data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
+  return {
+    id: page.id,
+    title,
+    publishedOn,
+    content: blocks.results,
+  };
+});
 
-    if (id) {
-      fetchPageData();
+export async function generateMetadata({ params }) {
+  const { id } = params;
+  const pageData = await getPageData(id);
+
+  return {
+    title: `${pageData.title} | DeadDrop Articles`,
+    description: `Read ${pageData.title} on DeadDrop. Published on ${new Date(
+      pageData.publishedOn
+    ).toLocaleDateString()}`,
+    openGraph: {
+      title: pageData.title,
+      description: `Read ${pageData.title} on DeadDrop. Published on ${new Date(
+        pageData.publishedOn
+      ).toLocaleDateString()}`,
+      type: "article",
+      publishedTime: pageData.publishedOn,
+    },
+  };
+}
+
+export const revalidate = 60;
+
+export default async function Page({ params }) {
+  const { id } = params;
+  const pageData = await getPageData(id);
+  const publishedDate = new Date(pageData.publishedOn).toLocaleDateString(
+    "en-GB",
+    {
+      day: "2-digit",
+      month: "long",
+      year: "numeric",
     }
-  }, [id]);
+  );
 
   const renderBlockContent = (block) => {
     if (!block[block.type]?.rich_text) return null;
@@ -64,7 +72,7 @@ export default function Page() {
           <h3 className="text-2xl font-semibold mt-4 mb-2">{textContent}</h3>
         );
       case "paragraph":
-        return <p className="my-4 ">{textContent}</p>;
+        return <p className="my-4">{textContent}</p>;
       case "bulleted_list_item":
         return (
           <ul className="list-disc ml-6 my-1">
@@ -82,38 +90,50 @@ export default function Page() {
     }
   };
 
-  if (loading)
-    return (
-      <div className="p-4 w-screen h-screen grid place-items-center">
-        Loading...
-      </div>
-    );
-
-  if (!pageData)
-    return (
-      <div className="p-4 w-screen h-screen grid place-items-center">
-        Error: No data found
-      </div>
-    );
+  const structuredData = {
+    "@context": "https://schema.org",
+    "@type": "Article",
+    headline: pageData.title,
+    datePublished: pageData.publishedOn,
+    author: {
+      "@type": "Organization",
+      name: "DeadDrop",
+      url: "https://deaddrop.space",
+    },
+    publisher: {
+      "@type": "Organization",
+      name: "DeadDrop",
+      logo: {
+        "@type": "ImageObject",
+        url: "https://deaddrop.space/logo.svg",
+      },
+    },
+  };
 
   return (
-    <div className=" mx-auto p-4 mt-10 max-w-[720px]">
-      <div className="mb-6">
-        Published on{" "}
-        <span className="!text-white font-medium">{publishedDate}</span>
+    <>
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(structuredData) }}
+      />
+      <div className="mx-auto p-4 mt-10 max-w-[720px]">
+        <div className="mb-6">
+          Published on{" "}
+          <span className="!text-white font-medium">{publishedDate}</span>
+        </div>
+        <h1 className="text-4xl font-black mb-8">
+          {pageData.title || "Untitled"}
+        </h1>
+        <div className="prose">
+          {pageData.content.length > 0 ? (
+            pageData.content.map((block, index) => (
+              <div key={index}>{renderBlockContent(block)}</div>
+            ))
+          ) : (
+            <p>No content found</p>
+          )}
+        </div>
       </div>
-      <h1 className="text-4xl font-black mb-8">
-        {pageData.title || "Untitled"}
-      </h1>
-      <div className="prose">
-        {pageData.content.length > 0 ? (
-          pageData.content.map((block, index) => (
-            <div key={index}>{renderBlockContent(block)}</div>
-          ))
-        ) : (
-          <p>No content found</p>
-        )}
-      </div>
-    </div>
+    </>
   );
 }
