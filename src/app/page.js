@@ -3,7 +3,6 @@
 import { useState } from "react";
 import { Toaster, toast } from "sonner";
 import { encryptFile, encryptPasskey, toBase64 } from "@/utils/encryption";
-import { supabase } from "@/libs/supabase";
 import { Rocket, Upload } from "@/icons";
 import {
   Select,
@@ -150,26 +149,6 @@ export default function UploadFile() {
   };
 
   /**
-   * Checks if a file with the given name already exists in the database
-   * @param {string} name - The name to check
-   * @returns {Promise<boolean>} - Whether the name exists
-   */
-  const checkNameExists = async (name) => {
-    try {
-      const { data, error } = await supabase
-        .from("metadata")
-        .select("name")
-        .eq("name", name);
-
-      if (error) throw error;
-      return data && data.length > 0;
-    } catch (error) {
-      console.error("Error checking if name exists:", error);
-      throw error;
-    }
-  };
-
-  /**
    * Handles the file upload process
    */
   const handleUpload = async () => {
@@ -190,45 +169,41 @@ export default function UploadFile() {
     setUploadProgress(0);
 
     try {
-      // Check if name already exists
-      const nameExists = await checkNameExists(name);
-      if (nameExists) {
-        toast.error("A file with this name already exists.");
-        setIsUploading(false);
-        return;
-      }
-
       // Encrypt the file
       const { encryptedFile, encryptedVerification, salt, iv, verificationIV } =
         await encryptFile(selectedFile, key);
 
-      // Upload the encrypted file
-      const uploadResult = await uploadFile(
-        encryptedFile,
-        "files",
-        (progress) => {
-          setUploadProgress(progress);
-        }
+      // Create form data for the API request
+      const formData = new FormData();
+      formData.append("file", new Blob([encryptedFile]));
+      formData.append(
+        "metadata",
+        JSON.stringify({
+          name,
+          file_name: fileName,
+          file_type: fileType,
+          file_size: fileSize,
+          encrypted_verification: toBase64(encryptedVerification),
+          salt: toBase64(salt),
+          iv: toBase64(iv),
+          verification_IV: toBase64(verificationIV),
+          expiry_days: expiryDays,
+          max_downloads: maxDownloads,
+        })
       );
 
-      if (!uploadResult.success) throw new Error(uploadResult.error);
+      // Upload using the API endpoint
+      const response = await fetch("/api/upload", {
+        method: "POST",
+        body: formData,
+      });
 
-      // Get public URL for the uploaded file
-      const publicUrl = supabase.storage
-        .from("files")
-        .getPublicUrl(uploadResult.filePath).data?.publicUrl;
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Upload failed");
+      }
 
-      // Insert file metadata into database
-      const metaResult = await insertFileData(
-        encryptedVerification,
-        salt,
-        iv,
-        verificationIV,
-        uploadResult.filePath,
-        publicUrl
-      );
-
-      if (!metaResult.success) throw new Error(metaResult.error);
+      const data = await response.json();
 
       // Generate and show share link
       const encryptedKey = encryptPasskey(key);
@@ -238,8 +213,7 @@ export default function UploadFile() {
       const generatedShareLink = `https://deaddrop.space/download?name=${safeName}&key=${safeEncryptedKey}`;
       setShareLink(generatedShareLink);
       setShowShareDialog(true);
-
-      console.log("Upload complete:", uploadResult.filePath);
+      setUploadProgress(100);
     } catch (error) {
       toast.error("Upload failed: " + error.message);
       console.error("Upload error:", error);
@@ -254,107 +228,6 @@ export default function UploadFile() {
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareLink);
     toast.success("Link copied to clipboard!");
-  };
-
-  /**
-   * Inserts file metadata into the database
-   * @param {Uint8Array} encryptedVerification - Verification data
-   * @param {Uint8Array} salt - Encryption salt
-   * @param {Uint8Array} iv - Initialization vector
-   * @param {Uint8Array} verificationIV - Verification IV
-   * @param {string} filePath - Path to the stored file
-   * @param {string} downloadUrl - Public download URL
-   * @returns {Promise<{success: boolean, error?: string, data?: any}>} - Result of the operation
-   */
-  const insertFileData = async (
-    encryptedVerification,
-    salt,
-    iv,
-    verificationIV,
-    filePath,
-    downloadUrl
-  ) => {
-    try {
-      const { data, error } = await supabase.from("metadata").insert([
-        {
-          name: name,
-          file_name: fileName,
-          file_type: fileType,
-          file_size: fileSize,
-          encrypted_verification: toBase64(encryptedVerification),
-          salt: toBase64(salt),
-          iv: toBase64(iv),
-          verification_IV: toBase64(verificationIV),
-          file_path: filePath,
-          download_url: downloadUrl,
-          expiry_days: expiryDays,
-          max_downloads: maxDownloads,
-          downloads: 0,
-        },
-      ]);
-
-      if (error) {
-        console.error("Error inserting file data:", error.message);
-        return { success: false, error: error.message };
-      }
-
-      console.log("File data inserted successfully:", data);
-      return { success: true, data };
-    } catch (error) {
-      console.error("Unexpected error:", error);
-      return { success: false, error: error.message };
-    }
-  };
-
-  /**
-   * Uploads a file to Supabase storage with progress tracking
-   * @param {File} file - The file to upload
-   * @param {string} bucketName - The storage bucket name
-   * @param {function} onProgress - Progress callback
-   * @returns {Promise<{success: boolean, filePath?: string, error?: string}>} - Upload result
-   */
-  const uploadFile = async (file, bucketName, onProgress) => {
-    try {
-      const safeName = name.replace(/[^a-zA-Z0-9-_\.]/g, "_");
-      const fileName = `${safeName}.enc`;
-
-      // Check if file already exists in storage
-      const { data: existingFiles, error: existingError } =
-        await supabase.storage.from(bucketName).list("", { search: fileName });
-
-      if (existingError) throw existingError;
-
-      if (existingFiles?.some((f) => f.name === fileName)) {
-        return {
-          success: false,
-          error: "A file with this name already exists in storage",
-        };
-      }
-
-      // Get a signed upload URL from Supabase
-      const { data: signedUrlData, error: signedUrlError } =
-        await supabase.storage.from(bucketName).createSignedUploadUrl(fileName);
-
-      if (signedUrlError) throw signedUrlError;
-
-      // Upload using axios with progress tracking
-      await axios.put(signedUrlData.signedUrl, file, {
-        headers: {
-          "Content-Type": "application/octet-stream",
-        },
-        onUploadProgress: (progressEvent) => {
-          const percentCompleted = Math.round(
-            (progressEvent.loaded * 100) / progressEvent.total
-          );
-          onProgress(percentCompleted);
-        },
-      });
-
-      return { success: true, filePath: fileName };
-    } catch (error) {
-      console.error("Upload Error:", error.message);
-      return { success: false, error: error.message };
-    }
   };
 
   return (
@@ -494,13 +367,13 @@ export default function UploadFile() {
                 >
                   <div
                     style={{ width: `${uploadProgress}%` }}
-                    className={`h-full bg-green-400 absolute left-0 rounded-md transition-all duration-300`}
+                    className={`h-full absolute left-0 rounded-md transition-all duration-300`}
                   />
                   <span className="group-hover/modal-btn:translate-x-80 z-10  text-xl font-medium text-center transition duration-500">
                     {uploadProgress === 100
-                      ? "Upload Complete"
-                      : uploadProgress
-                      ? `Uploading ${uploadProgress}%`
+                      ? "Uploaded successfully"
+                      : isUploading
+                      ? "Uploading..."
                       : "Upload"}
                   </span>
                   <div className="-translate-x-80 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">

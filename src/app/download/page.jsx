@@ -9,7 +9,6 @@ import {
   fromBase64,
   decryptPasskey,
 } from "@/utils/encryption";
-import { supabase } from "@/libs/supabase";
 import { useQueryState } from "nuqs";
 import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
@@ -24,15 +23,14 @@ export default function DownloadPage() {
   const [key, setKey] = useState("");
 
   // Download progress state
-  const [uploadProgress, setUploadProgress] = useState(0);
-  const [statusMessage, setStatusMessage] = useState("");
   const [isDownloading, setIsDownloading] = useState(false);
+  const [isCompleted, setIsCompleted] = useState(false);
 
   const [queryName, setQueryName] = useQueryState("name");
   const [queryKey, setQueryKey] = useQueryState("key");
 
   /**
-   * Handles the file download process with progress tracking
+   * Handles the file download process
    */
   const handleDownload = async () => {
     // Validate inputs
@@ -46,94 +44,37 @@ export default function DownloadPage() {
     }
 
     setIsDownloading(true);
-    setStatusMessage("Verifying...");
-    setUploadProgress(0);
+    setIsCompleted(false);
 
     try {
-      // Fetch file metadata from Supabase
-      const { data, error } = await supabase
-        .from("metadata")
-        .select(
-          "file_name, encrypted_verification, salt, iv, verification_IV, download_url, max_downloads, downloads"
-        )
-        .eq("name", name)
-        .single();
-
-      if (error || !data) {
-        throw new Error("No file found with this name");
-      }
-
-      const {
-        file_name,
-        encrypted_verification,
-        salt,
-        iv,
-        verification_IV,
-        download_url,
-        max_downloads,
-        downloads,
-      } = data;
-
-      // Convert base64 strings to Uint8Arrays
-      const encryptedVerification = fromBase64(encrypted_verification);
-      const saltArray = fromBase64(salt);
-      const verificationIVArray = fromBase64(verification_IV);
-      const ivArray = fromBase64(iv);
-
-      // Verify the passkey
-      setStatusMessage("Verifying key...");
-      const isValid = await verifyPasskey(
-        key,
-        saltArray,
-        verificationIVArray,
-        encryptedVerification
-      );
-
-      if (!isValid) {
-        throw new Error("Invalid key provided");
-      }
-
-      if (downloads >= max_downloads) {
-        toast.error(
-          "This file has been permanently deleted as it exceeded the maximum number of allowed downloads."
-        );
-        return;
-      } else {
-        const updatedCount = downloads + 1;
-        const { error: updateError } = await supabase
-          .from("metadata")
-          .update({ downloads: updatedCount })
-          .eq("name", name);
-
-        if (updateError) {
-          console.error("Error updating downloads:", updateError);
-        }
-      }
-
-      // Download the encrypted file with progress tracking
-      setStatusMessage("Downloading...");
-      const response = await axios.get(download_url, {
-        responseType: "blob",
-        onDownloadProgress: (progressEvent) => {
-          if (progressEvent.total) {
-            const percentCompleted = Math.round(
-              (progressEvent.loaded * 100) / progressEvent.total
-            );
-            setUploadProgress(percentCompleted);
-          }
+      // Start the download process
+      const response = await fetch("/api/download", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
         },
+        body: JSON.stringify({
+          name: name || queryName,
+          key: key || queryKey,
+        }),
       });
 
-      // Decrypt the file
-      setStatusMessage("Decrypting...");
-      setUploadProgress(95); // Indicate we're moving to decryption phase
+      if (!response.ok) {
+        const error = await response.json();
+        throw new Error(error.error || "Download failed");
+      }
 
-      const encryptedBlob = response.data;
-      const encryptedBuffer = await encryptedBlob.arrayBuffer();
+      const data = await response.json();
+
+      // Decrypt the file
+      const { file_name, encrypted_data, salt, iv } = data;
+      const encryptedBuffer = new Uint8Array(encrypted_data).buffer;
+      const saltArray = new Uint8Array(salt);
+      const ivArray = new Uint8Array(iv);
 
       const decryptedBlob = await decryptFile(
         encryptedBuffer,
-        key,
+        key || queryKey,
         saltArray,
         ivArray
       );
@@ -146,15 +87,11 @@ export default function DownloadPage() {
       a.click();
       URL.revokeObjectURL(url);
 
-      // Finalize
-      setStatusMessage("Download complete!");
-      setUploadProgress(100);
       toast.success("File downloaded successfully!");
+      setIsCompleted(true);
     } catch (error) {
       console.error("Download failed:", error);
       toast.error(error.message || "An error occurred during download");
-      setStatusMessage("");
-      setUploadProgress(0);
     } finally {
       setIsDownloading(false);
     }
@@ -224,15 +161,11 @@ export default function DownloadPage() {
                 disabled={isDownloading}
                 className="px-4 py-2 rounded-md text-center relative overflow-hidden cursor-pointer bg-white/90 text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
               >
-                <div
-                  style={{ width: `${uploadProgress}%` }}
-                  className={`h-full bg-green-400 absolute left-0 rounded-md transition-all duration-300`}
-                />
                 <span className="group-hover/modal-btn:translate-x-80 z-10 text-xl font-medium text-center transition duration-500">
-                  {uploadProgress >= 100
-                    ? "Download Complete"
-                    : uploadProgress > 0
-                    ? `${statusMessage} (${uploadProgress}%)`
+                  {isCompleted
+                    ? "Downloaded successfully"
+                    : isDownloading
+                    ? "Downloading..."
                     : "Download"}
                 </span>
                 <div className="-translate-x-80 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
