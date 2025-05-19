@@ -37,7 +37,7 @@ import Footer from "@/components/footer";
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
 const MIN_KEY_LENGTH = 8;
-const MAX_FILE_SIZE_MB = 10;
+const MAX_FILE_SIZE_MB = 12;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 export default function UploadFile() {
