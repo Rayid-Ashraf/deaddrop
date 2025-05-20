@@ -37,7 +37,7 @@ import Footer from "@/components/footer";
 // Constants for validation
 const MIN_NAME_LENGTH = 10;
 const MIN_KEY_LENGTH = 8;
-const MAX_FILE_SIZE_MB = 12;
+const MAX_FILE_SIZE_MB = 10;
 const MAX_FILE_SIZE_BYTES = MAX_FILE_SIZE_MB * 1024 * 1024;
 
 export default function UploadFile() {
@@ -173,12 +173,59 @@ export default function UploadFile() {
       const { encryptedFile, encryptedVerification, salt, iv, verificationIV } =
         await encryptFile(selectedFile, key);
 
-      // Create form data for the API request
-      const formData = new FormData();
-      formData.append("file", new Blob([encryptedFile]));
-      formData.append(
-        "metadata",
-        JSON.stringify({
+      // Generate a safe file name
+      const safeFileName = name.replace(/[^a-zA-Z0-9-_\.]/g, "_");
+      const encryptedFileName = `${safeFileName}.enc`;
+
+      // Get signed URL for upload
+      const signedUrlResponse = await fetch("/api/upload/signed-url", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({ encryptedFileName }),
+      });
+
+      if (!signedUrlResponse.ok) {
+        const error = await signedUrlResponse.json();
+        throw new Error(error.error || "Failed to get upload URL");
+      }
+
+      const { signedUrl, path } = await signedUrlResponse.json();
+
+      // Upload file using signed URL with progress tracking
+      const xhr = new XMLHttpRequest();
+      xhr.open("PUT", signedUrl);
+      xhr.setRequestHeader("Content-Type", "application/octet-stream");
+
+      // Track upload progress
+      xhr.upload.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 99; // Cap at 99%
+          setUploadProgress(Math.round(progress));
+        }
+      };
+
+      // Handle upload completion
+      await new Promise((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve();
+          } else {
+            reject(new Error("Upload failed"));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Upload failed"));
+        xhr.send(encryptedFile);
+      });
+
+      // Save metadata
+      const metadataResponse = await fetch("/api/upload/metadata", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
           name,
           file_name: fileName,
           file_type: fileType,
@@ -187,23 +234,19 @@ export default function UploadFile() {
           salt: toBase64(salt),
           iv: toBase64(iv),
           verification_IV: toBase64(verificationIV),
+          file_path: path,
           expiry_days: expiryDays,
           max_downloads: maxDownloads,
-        })
-      );
-
-      // Upload using the API endpoint
-      const response = await fetch("/api/upload", {
-        method: "POST",
-        body: formData,
+        }),
       });
 
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.error || "Upload failed");
+      if (!metadataResponse.ok) {
+        const error = await metadataResponse.json();
+        throw new Error(error.error || "Failed to save metadata");
       }
 
-      const data = await response.json();
+      // Set progress to 100% only after metadata is saved successfully
+      setUploadProgress(100);
 
       // Generate and show share link
       const encryptedKey = encryptPasskey(key);
@@ -213,7 +256,6 @@ export default function UploadFile() {
       const generatedShareLink = `https://deaddrop.space/download?name=${safeName}&key=${safeEncryptedKey}`;
       setShareLink(generatedShareLink);
       setShowShareDialog(true);
-      setUploadProgress(100);
     } catch (error) {
       toast.error("Upload failed: " + error.message);
       console.error("Upload error:", error);
@@ -323,7 +365,7 @@ export default function UploadFile() {
                         }
                       >
                         {" "}
-                        <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
+                        <SelectTrigger className="w-[112px] cursor-pointer !bg-black">
                           <SelectValue placeholder="30 days" />
                         </SelectTrigger>
                         <SelectContent>
@@ -346,15 +388,15 @@ export default function UploadFile() {
                         }
                       >
                         {" "}
-                        <SelectTrigger className="w-[100px] cursor-pointer !bg-black">
-                          <SelectValue placeholder="Infinite downloads" />
+                        <SelectTrigger className="w-[112px] cursor-pointer !bg-black">
+                          <SelectValue placeholder="Unlimited downloads" />
                         </SelectTrigger>
                         <SelectContent>
                           <SelectItem value="1">1</SelectItem>
                           <SelectItem value="10">10</SelectItem>
                           <SelectItem value="100">100</SelectItem>
                           <SelectItem value="1000">1000</SelectItem>
-                          <SelectItem value="100000">Infinite</SelectItem>
+                          <SelectItem value="100000">Unlimited</SelectItem>
                         </SelectContent>
                       </Select>
                     </div>
@@ -367,13 +409,13 @@ export default function UploadFile() {
                 >
                   <div
                     style={{ width: `${uploadProgress}%` }}
-                    className={`h-full absolute left-0 rounded-md transition-all duration-300`}
+                    className={`h-full absolute left-0 rounded-md bg-green-400 transition-all duration-300`}
                   />
                   <span className="group-hover/modal-btn:translate-x-80 z-10  text-xl font-medium text-center transition duration-500">
                     {uploadProgress === 100
                       ? "Uploaded successfully"
                       : isUploading
-                      ? "Uploading..."
+                      ? `Uploading ${uploadProgress}%`
                       : "Upload"}
                   </span>
                   <div className="-translate-x-80 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">

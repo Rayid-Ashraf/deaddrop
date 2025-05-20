@@ -25,6 +25,7 @@ export default function DownloadPage() {
   // Download progress state
   const [isDownloading, setIsDownloading] = useState(false);
   const [isCompleted, setIsCompleted] = useState(false);
+  const [downloadProgress, setDownloadProgress] = useState(0);
 
   const [queryName, setQueryName] = useQueryState("name");
   const [queryKey, setQueryKey] = useQueryState("key");
@@ -45,17 +46,17 @@ export default function DownloadPage() {
 
     setIsDownloading(true);
     setIsCompleted(false);
+    setDownloadProgress(0);
 
     try {
-      // Start the download process
-      const response = await fetch("/api/download", {
+      // Get signed URL and metadata
+      const response = await fetch("/api/download/signed-url", {
         method: "POST",
         headers: {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
           name: name || queryName,
-          key: key || queryKey,
         }),
       });
 
@@ -64,13 +65,60 @@ export default function DownloadPage() {
         throw new Error(error.error || "Download failed");
       }
 
-      const data = await response.json();
+      const {
+        signedUrl,
+        file_name,
+        encrypted_verification,
+        salt,
+        iv,
+        verification_IV,
+      } = await response.json();
+
+      // Verify the key on client side
+      const encryptedVerification = fromBase64(encrypted_verification);
+      const saltArray = fromBase64(salt);
+      const verificationIVArray = fromBase64(verification_IV);
+      const ivArray = fromBase64(iv);
+
+      const isValid = await verifyPasskey(
+        key || queryKey,
+        saltArray,
+        verificationIVArray,
+        encryptedVerification
+      );
+
+      if (!isValid) {
+        throw new Error("Invalid key provided");
+      }
+
+      // Download file using XMLHttpRequest for progress tracking
+      const xhr = new XMLHttpRequest();
+      xhr.open("GET", signedUrl);
+      xhr.responseType = "arraybuffer";
+
+      // Track download progress
+      xhr.onprogress = (event) => {
+        if (event.lengthComputable) {
+          const progress = (event.loaded / event.total) * 99; // Cap at 99%
+          setDownloadProgress(Math.round(progress));
+        }
+      };
+
+      // Handle download completion
+      await new Promise((resolve, reject) => {
+        xhr.onload = () => {
+          if (xhr.status === 200) {
+            resolve(xhr.response);
+          } else {
+            reject(new Error("Download failed"));
+          }
+        };
+        xhr.onerror = () => reject(new Error("Download failed"));
+        xhr.send();
+      });
 
       // Decrypt the file
-      const { file_name, encrypted_data, salt, iv } = data;
-      const encryptedBuffer = new Uint8Array(encrypted_data).buffer;
-      const saltArray = new Uint8Array(salt);
-      const ivArray = new Uint8Array(iv);
+      const encryptedBuffer = xhr.response;
 
       const decryptedBlob = await decryptFile(
         encryptedBuffer,
@@ -78,6 +126,11 @@ export default function DownloadPage() {
         saltArray,
         ivArray
       );
+
+      // Set progress to 100% after decryption is complete
+      setDownloadProgress(100);
+
+      console.log(file_name);
 
       // Create download link and trigger download
       const url = URL.createObjectURL(decryptedBlob);
@@ -161,11 +214,15 @@ export default function DownloadPage() {
                 disabled={isDownloading}
                 className="px-4 py-2 rounded-md text-center relative overflow-hidden cursor-pointer bg-white/90 text-black h-12 items-center w-full flex justify-center group/modal-btn disabled:opacity-60 disabled:cursor-not-allowed"
               >
+                <div
+                  style={{ width: `${downloadProgress}%` }}
+                  className={`h-full absolute left-0 rounded-md bg-green-400 transition-all duration-300`}
+                />
                 <span className="group-hover/modal-btn:translate-x-80 z-10 text-xl font-medium text-center transition duration-500">
                   {isCompleted
                     ? "Downloaded successfully"
                     : isDownloading
-                    ? "Downloading..."
+                    ? `Downloading ${downloadProgress}%`
                     : "Download"}
                 </span>
                 <div className="-translate-x-80 group-hover/modal-btn:translate-x-0 flex items-center justify-center absolute inset-0 transition duration-500 text-white z-20">
