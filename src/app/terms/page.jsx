@@ -103,9 +103,9 @@ export default function TermsPage() {
                 7. Disclaimer of Warranties
               </h2>
               <p className="mb-4">
-                The service is provided "as is" without any warranties,
-                expressed or implied. We do not guarantee that the service will
-                be uninterrupted or error-free.
+                The service is provided &quot;as is&quot; without any
+                warranties, expressed or implied. We do not guarantee that the
+                service will be uninterrupted or error-free.
               </p>
             </section>
 
