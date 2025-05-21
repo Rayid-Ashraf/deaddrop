@@ -91,35 +91,42 @@ export default function DownloadPage() {
         throw new Error("Invalid key provided");
       }
 
-      // Download file using XMLHttpRequest for progress tracking
-      const xhr = new XMLHttpRequest();
-      xhr.open("GET", signedUrl);
-      xhr.responseType = "arraybuffer";
+      // Download file using Fetch API with streaming
+      const downloadResponse = await fetch(signedUrl);
 
-      // Track download progress
-      xhr.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = (event.loaded / event.total) * 99; // Cap at 99%
+      if (!downloadResponse.ok) {
+        throw new Error("Download failed");
+      }
+
+      // Get the content length for progress tracking
+      const contentLength = downloadResponse.headers.get("content-length");
+      const total = parseInt(contentLength, 10);
+      let loaded = 0;
+
+      // Create a TransformStream to track progress
+      const progressStream = new TransformStream({
+        transform(chunk, controller) {
+          loaded += chunk.length;
+          const progress = (loaded / total) * 99; // Cap at 99%
           setDownloadProgress(Math.round(progress));
-        }
-      };
-
-      // Handle download completion
-      await new Promise((resolve, reject) => {
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            resolve(xhr.response);
-          } else {
-            reject(new Error("Download failed"));
-          }
-        };
-        xhr.onerror = () => reject(new Error("Download failed"));
-        xhr.send();
+          controller.enqueue(chunk);
+        },
       });
 
-      // Decrypt the file
-      const encryptedBuffer = xhr.response;
+      // Pipe the response through our progress tracking stream
+      const stream = downloadResponse.body.pipeThrough(progressStream);
 
+      // Read the stream into an ArrayBuffer
+      const reader = stream.getReader();
+      const chunks = [];
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+        chunks.push(value);
+      }
+      const encryptedBuffer = await new Blob(chunks).arrayBuffer();
+
+      // Decrypt the file
       const decryptedBlob = await decryptFile(
         encryptedBuffer,
         key || queryKey,
@@ -129,8 +136,6 @@ export default function DownloadPage() {
 
       // Set progress to 100% after decryption is complete
       setDownloadProgress(100);
-
-      console.log(file_name);
 
       // Create download link and trigger download
       const url = URL.createObjectURL(decryptedBlob);

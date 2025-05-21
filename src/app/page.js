@@ -193,31 +193,27 @@ export default function UploadFile() {
 
       const { signedUrl, path } = await signedUrlResponse.json();
 
-      // Upload file using signed URL with progress tracking
-      const xhr = new XMLHttpRequest();
-      xhr.open("PUT", signedUrl);
-      xhr.setRequestHeader("Content-Type", "application/octet-stream");
-
-      // Track upload progress
-      xhr.upload.onprogress = (event) => {
-        if (event.lengthComputable) {
-          const progress = (event.loaded / event.total) * 99; // Cap at 99%
-          setUploadProgress(Math.round(progress));
-        }
-      };
-
-      // Handle upload completion
-      await new Promise((resolve, reject) => {
-        xhr.onload = () => {
-          if (xhr.status === 200) {
-            resolve();
-          } else {
-            reject(new Error("Upload failed"));
-          }
-        };
-        xhr.onerror = () => reject(new Error("Upload failed"));
-        xhr.send(encryptedFile);
+      // Create a ReadableStream from the encrypted file
+      const fileStream = new ReadableStream({
+        start(controller) {
+          controller.enqueue(encryptedFile);
+          controller.close();
+        },
       });
+
+      // Upload file using Fetch API with streaming
+      const uploadResponse = await fetch(signedUrl, {
+        method: "PUT",
+        headers: {
+          "Content-Type": "application/octet-stream",
+        },
+        body: fileStream,
+        duplex: "half",
+      });
+
+      if (!uploadResponse.ok) {
+        throw new Error("Upload failed");
+      }
 
       // Save metadata
       const metadataResponse = await fetch("/api/upload/metadata", {
