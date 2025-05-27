@@ -49,7 +49,7 @@ This stack enables DeadDrop to provide zero-knowledge, privacy-first file sharin
 ### Local Development
 
 ```bash
-git clone https://github.com/YOUR_USERNAME/deaddrop.space.git
-cd deaddrop.space
+git clone https://github.com/rayid-ashraf/deaddrop.git
+cd deaddrop
 npm install
 npm run dev
