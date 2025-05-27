@@ -35,28 +35,16 @@ To give users even more control, DeadDrop lets you:
 When either limit is reached, the file is automatically and permanently deleted from our storage — no manual cleanup needed.
 
 This makes DeadDrop ideal for one-time or time-sensitive sharing.
+## 🛠 Tech Stack
 
-### 🌍 Who Is It For?
+DeadDrop.space is built using modern, reliable technologies to ensure security, performance, and ease of development:
 
-DeadDrop is useful for anyone who wants to share files safely, privately, and without friction:
+- **Frontend:** [Next.js](https://nextjs.org/) — React framework for server-side rendering and static site generation  
+- **Backend & Storage:** [Supabase Storage](https://supabase.com/) — Open source Firebase alternative for storing encrypted files  
+- **Encryption:** Web Crypto API with **AES-256 GCM** — Industry-standard encryption performed entirely in the browser  
 
-- 👩‍🏫 Teachers sharing class notes, assignments, or answer sheets  
-- 🧑‍💻 Developers sending builds, config files, or access tokens  
-- 🕵️ Journalists and whistleblowers sharing sensitive information securely  
-- 💼 Freelancers delivering final work to clients without setting up file drives  
-- 🤝 Teams who need to pass around credentials, license keys, or one-time files  
+This stack enables DeadDrop to provide zero-knowledge, privacy-first file sharing without compromising usability.
 
-If you’ve ever hesitated to send a file over email, chat apps, or cloud drives because of privacy concerns, DeadDrop is for you.
-
-### 🚀 Why It Stands Out
-
-- 🔐 End-to-end encryption: Strong AES-256 encryption done entirely in the browser  
-- 🛡️ Zero-knowledge storage: We literally can’t read your files  
-- 🧾 No signups or user data: Completely anonymous usage  
-- 🧩 Cross-platform: Works on any modern browser — phone, tablet, or desktop  
-- ⏳ Auto-expiry + download limits: Files are deleted when no longer needed  
-
----
 
 ### Local Development
 
