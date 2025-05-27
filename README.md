@@ -1,36 +1,67 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://github.com/vercel/next.js/tree/canary/packages/create-next-app).
+## 🚀 Getting Started
 
-## Getting Started
+DeadDrop.space is a secure, anonymous file-sharing platform built to prioritize privacy, control, and simplicity. Unlike typical file-sharing services that ask you to sign up, verify emails, or agree to endless terms, DeadDrop lets you upload and share files without any account.
 
-First, run the development server:
+It was created for people who value discretion and want full control over how their files are shared.
+
+### 🧠 How It Works
+
+DeadDrop takes a different approach. Here's what makes it special:
+
+- You upload a file
+- Give it a custom name (like an ID) and a password (like a decryption key)
+- The file is encrypted right inside your browser using **AES-256** — a military-grade encryption algorithm
+- The encrypted version of the file is uploaded to the server — but the password is **never sent**
+- Share the name + password with someone, and they can access the file from anywhere — but only if they have both
+
+This all happens client-side, in the user’s browser, and the password is never stored anywhere. This means only the person who knows both the name and the correct password can access the file.
+
+### 🧱 Zero-Knowledge Architecture
+
+DeadDrop follows a zero-knowledge design, meaning:
+
+- We don’t store your password
+- We can’t decrypt your files
+- We don’t log any personal data
+- Even if someone compromised the server, they’d find only encrypted files with no keys attached — making the data unreadable and meaningless to attackers.
+
+### ⏳ File Expiry & Limits
+
+To give users even more control, DeadDrop lets you:
+
+- Set an expiry duration (e.g., 1 day, 7 days, 30 days)
+- Limit the maximum number of downloads
+
+When either limit is reached, the file is automatically and permanently deleted from our storage — no manual cleanup needed.
+
+This makes DeadDrop ideal for one-time or time-sensitive sharing.
+
+### 🌍 Who Is It For?
+
+DeadDrop is useful for anyone who wants to share files safely, privately, and without friction:
+
+- 👩‍🏫 Teachers sharing class notes, assignments, or answer sheets  
+- 🧑‍💻 Developers sending builds, config files, or access tokens  
+- 🕵️ Journalists and whistleblowers sharing sensitive information securely  
+- 💼 Freelancers delivering final work to clients without setting up file drives  
+- 🤝 Teams who need to pass around credentials, license keys, or one-time files  
+
+If you’ve ever hesitated to send a file over email, chat apps, or cloud drives because of privacy concerns, DeadDrop is for you.
+
+### 🚀 Why It Stands Out
+
+- 🔐 End-to-end encryption: Strong AES-256 encryption done entirely in the browser  
+- 🛡️ Zero-knowledge storage: We literally can’t read your files  
+- 🧾 No signups or user data: Completely anonymous usage  
+- 🧩 Cross-platform: Works on any modern browser — phone, tablet, or desktop  
+- ⏳ Auto-expiry + download limits: Files are deleted when no longer needed  
+
+---
+
+### Local Development
 
 ```bash
+git clone https://github.com/YOUR_USERNAME/deaddrop.space.git
+cd deaddrop.space
+npm install
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
-```
-
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
-
-You can start editing the page by modifying `app/page.js`. The page auto-updates as you edit the file.
-
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
-
-## Learn More
-
-To learn more about Next.js, take a look at the following resources:
-
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
-
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
-
-## Deploy on Vercel
-
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
-
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
