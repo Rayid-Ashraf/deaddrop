@@ -22,13 +22,16 @@ export default function Page() {
           access them.
         </p>
 
-        <p className="text-lg text-gray-200 mb-10 leading-relaxed">
+        <p className="text-lg text-gray-200 mb-6 leading-relaxed">
           Unlike traditional file-sharing services, DeadDrop never stores your
           passwords or private data. We never even see your unencrypted files.
           Everything is designed so that your information remains yours — and
           yours alone.
         </p>
-
+        
+ <p className="text-lg italic text-gray-200 mb-10 leading-relaxed">
+Note: Use a VPN for more anonymity.        </p>
+        
         <h2 className="text-3xl font-bold mt-12 mb-6 tracking-tight">
           How it works
         </h2>
