@@ -91,6 +91,22 @@ export default function DownloadPage() {
         throw new Error("Invalid key provided");
       }
 
+      // Update download count after successful verification
+      const updateCountResponse = await fetch("/api/download/update-count", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify({
+          name: name || queryName,
+        }),
+      });
+
+      if (!updateCountResponse.ok) {
+        const error = await updateCountResponse.json();
+        throw new Error(error.error || "Failed to update download count");
+      }
+
       // Download file using Fetch API with streaming
       const downloadResponse = await fetch(signedUrl);
 

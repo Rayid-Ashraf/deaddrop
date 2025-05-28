@@ -59,17 +59,6 @@ export async function POST(request) {
       );
     }
 
-    // Update download count
-    const updatedCount = downloads + 1;
-    const { error: updateError } = await supabase
-      .from("metadata")
-      .update({ downloads: updatedCount })
-      .eq("name", name);
-
-    if (updateError) {
-      console.error("Error updating downloads:", updateError);
-    }
-
     return NextResponse.json({
       signedUrl: signedUrlData.signedUrl,
       file_name,
