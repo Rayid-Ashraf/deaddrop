@@ -13,7 +13,7 @@ export default function Footer() {
         </Link>
       </div>
       <div className="text-lg">
-        © {new Date().getFullYear()} Deaddrop. All rights reserved.
+        © {new Date().getFullYear()} Deaddrop. Licensed under the GNU GPL v3.
       </div>
     </footer>
   );
