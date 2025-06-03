@@ -1,7 +1,7 @@
 import { Client } from "@notionhq/client";
 import { cache } from "react";
 
-const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_TOKEN });
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const getPageData = cache(async (pageId) => {
   const page = await notion.pages.retrieve({ page_id: pageId });

@@ -3,10 +3,10 @@ import Header from "@/components/header";
 import { Client } from "@notionhq/client";
 import { cache } from "react";
 
-const notion = new Client({ auth: process.env.NEXT_PUBLIC_NOTION_TOKEN });
+const notion = new Client({ auth: process.env.NOTION_TOKEN });
 
 const getArticles = cache(async () => {
-  const databaseId = "1e3ba73e900f80a5a7f3fe954c3d1e06";
+  const databaseId = process.env.NOTION_DATABASE_ID;
 
   const response = await notion.databases.query({
     database_id: databaseId,
