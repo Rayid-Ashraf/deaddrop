@@ -28,10 +28,20 @@ export default function Page() {
           Everything is designed so that your information remains yours — and
           yours alone.
         </p>
-        
- <p className="text-lg italic text-gray-200 mb-10 leading-relaxed">
-Note: Use a VPN for more anonymity.        </p>
-        
+
+        <p className="text-lg text-gray-200 mb-6 leading-relaxed">
+          DeadDrop Space is now open source! You can find the code on{" "}
+          <a
+            href="https://github.com/Rayid-Ashraf/deaddrop"
+            className="text-blue-500"
+          >
+            GitHub
+          </a>
+        </p>
+        <p className="text-lg italic text-gray-200 mb-10 leading-relaxed">
+          Tip: Use a VPN for more anonymity.
+        </p>
+
         <h2 className="text-3xl font-bold mt-12 mb-6 tracking-tight">
           How it works
         </h2>
