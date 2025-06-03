@@ -9,7 +9,6 @@ import {
   fromBase64,
   decryptPasskey,
 } from "@/utils/encryption";
-import { useQueryState } from "nuqs";
 import axios from "axios";
 import AnnouncementBar from "@/components/announcement-bar";
 import HeroText from "@/components/text";
@@ -27,19 +26,14 @@ export default function DownloadPage() {
   const [isCompleted, setIsCompleted] = useState(false);
   const [downloadProgress, setDownloadProgress] = useState(0);
 
-  const [queryName, setQueryName] = useQueryState("name");
-  const [queryKey, setQueryKey] = useQueryState("key");
-
-  /**
-   * Handles the file download process
-   */
+  // Handles the file download process
   const handleDownload = async () => {
     // Validate inputs
-    if (!name && !queryName) {
+    if (!name) {
       toast.error("Please enter a name");
       return;
     }
-    if (!key && !queryKey) {
+    if (!key) {
       toast.error("Please enter a key");
       return;
     }
@@ -56,7 +50,7 @@ export default function DownloadPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: name || queryName,
+          name: name,
         }),
       });
 
@@ -81,7 +75,7 @@ export default function DownloadPage() {
       const ivArray = fromBase64(iv);
 
       const isValid = await verifyPasskey(
-        key || queryKey,
+        key,
         saltArray,
         verificationIVArray,
         encryptedVerification
@@ -98,7 +92,7 @@ export default function DownloadPage() {
           "Content-Type": "application/json",
         },
         body: JSON.stringify({
-          name: name || queryName,
+          name: name,
         }),
       });
 
@@ -145,7 +139,7 @@ export default function DownloadPage() {
       // Decrypt the file
       const decryptedBlob = await decryptFile(
         encryptedBuffer,
-        key || queryKey,
+        key,
         saltArray,
         ivArray
       );
@@ -172,10 +166,17 @@ export default function DownloadPage() {
   };
 
   useEffect(() => {
-    if (queryName && queryKey) {
-      const safeName = decodeURIComponent(queryName);
-      const safeQueryKey = decodeURIComponent(queryKey);
-      const decryptedKey = decryptPasskey(safeQueryKey);
+    // Parse URL fragment
+    const hash = window.location.hash.substring(1); // Remove the # character
+    const params = new URLSearchParams(hash);
+
+    const nameParam = params.get("name");
+    const keyParam = params.get("key");
+
+    if (nameParam && keyParam) {
+      const safeName = decodeURIComponent(nameParam);
+      const safeKey = decodeURIComponent(keyParam);
+      const decryptedKey = decryptPasskey(safeKey);
       setName(safeName);
       setKey(decryptedKey);
     }

@@ -255,7 +255,7 @@ export default function UploadFile() {
       const safeEncryptedKey = encodeURIComponent(encryptedKey);
       const safeName = encodeURIComponent(name);
 
-      const generatedShareLink = `https://deaddrop.space/download?name=${safeName}&key=${safeEncryptedKey}`;
+      const generatedShareLink = `https://deaddrop.space/download#name=${safeName}&key=${safeEncryptedKey}`;
       setShareLink(generatedShareLink);
       setShowShareDialog(true);
     } catch (error) {
@@ -266,9 +266,7 @@ export default function UploadFile() {
     }
   };
 
-  /**
-   * Copies the share link to clipboard
-   */
+  //  Copies the share link to clipboard
   const copyShareLink = () => {
     navigator.clipboard.writeText(shareLink);
     toast.success("Link copied to clipboard!");
